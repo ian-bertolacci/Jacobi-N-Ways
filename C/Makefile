@@ -10,7 +10,7 @@ EXES = $(BIN)/simple
 
 all: $(EXES)
 
-$(BIN)/simple: $(SRC)/Jacobi.c
+$(BIN)/simple: $(SRC)/simple.c
 	$(CXX) $^ $(CFLGS) -o $@
 
 clean:
