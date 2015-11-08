@@ -6,12 +6,12 @@ SRC=./src
 CXX=gcc
 CFLGS = -fopenmp
 
-EXES = $(BIN)/Jacobi_C_simple
+EXES = $(BIN)/simple
 
 all: $(EXES)
 
-$(BIN)/Jacobi_C_simple: $(SRC)/Jacobi.c
-	$(CXX) $^  $(CFLGS) -o $@
+$(BIN)/simple: $(SRC)/Jacobi.c
+	$(CXX) $^ $(CFLGS) -o $@
 
 clean:
 	- rm $(BIN)/*

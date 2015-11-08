@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <omp.h>
 
 typedef struct _grid_struct{
   double** data;
@@ -59,6 +60,8 @@ int main( char** argv, int argc ){
 
   populate_grid( grid_a );
 
+  double start = omp_get_wtime();
+
   // Do steps in pairs
   for( int t = 0; t < iterations; t += 2 ){
     step( grid_a, grid_b );
@@ -73,6 +76,15 @@ int main( char** argv, int argc ){
   } else {
     result = grid_a;
   }
+
+  double end = omp_get_wtime();
+  double elapsed = end - start;
+
+  printf( "Cell Updates: %d\n", iterations*grid_size*grid_size );
+  printf( "GFLOPS: %f\n", (iterations*grid_size*grid_size*5)/1e9 );
+  printf( "Elapsed: %fs\n", elapsed );
+  printf( "Per Cell Update: %fs\n", elapsed/(iterations*grid_size*grid_size) );
+  printf( "GFLOPS/s: %f\n", ((iterations*grid_size*grid_size*5)/elapsed)/1e9 );
 
   grid_dealloc( grid_a );
   grid_dealloc( grid_b );
