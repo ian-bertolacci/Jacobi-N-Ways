@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 if __name__ == "__main__":
-  N = 1000
+  N = 100
   T = 100
 
   grid = [ [[0]*(N+2)]*(N+2) ]*2
@@ -19,4 +19,11 @@ if __name__ == "__main__":
 
   end = time.time()
   elapsed = end - start
-  print "Elapsed: " + str(elapsed) + "s"
+  updates = ((N**2)*T)
+  gflops = updates/1e9
+
+  print "Cell Updates: {0}".format( updates )
+  print "GFLOPS: {0}".format( gflops )
+  print "Elapsed: {0}s".format( elapsed )
+  print "Per Cell Update: {0}s".format( elapsed/updates )
+  print "GFLOPS/s: {0}".format( gflops/elapsed )
