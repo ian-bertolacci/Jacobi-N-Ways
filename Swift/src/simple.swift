@@ -1,13 +1,42 @@
 import Foundation
+import Glibc
 
-var N = 4
-var T = 3
+var N = 10
+var T = 4
+
+// Parse arguments
+var arg_count = 0;
+for argument in Process.arguments{
+  switch( argument ){
+    case "--N":
+      let val = Int( Process.arguments[arg_count+1] )
+      if val != nil {
+        N = val!
+      } else {
+        print( "Integer required after --N" )
+        exit(-1)
+      }
+
+    case "--T":
+      let val = Int( Process.arguments[arg_count+1] )
+      if val != nil {
+        T = val!
+      } else {
+        print( "Integer required after --T" )
+        exit(-1)
+      }
+
+    default:
+      break // Break out of switch (not loop)
+  }
+  arg_count += 1
+}
 
 var grid = Array<Array<Array<Double>>>( count: 2, repeatedValue: Array<Array<Double>>(count: N+2, repeatedValue: Array<Double>(count: N+2, repeatedValue: 0.0 ) ) )
 
 let start = NSDate()
 
-for t in 1...T{
+for t in 1...T {
   let write = t & 1
   let read = 1 - write
 
@@ -28,4 +57,13 @@ for t in 1...T{
 }
 let end = NSDate()
 let elapsed = end.timeIntervalSinceDate( start )
+
+var cell_updates = N * N * T
+var gflops = Double(cell_updates*5)/1e9
+
+
+print( "Cell Updates: \(cell_updates)" )
+print( "GFLOPS: \(gflops)")
 print( "Elapsed: \(elapsed)s" )
+print( "Per Cell Update: \(elapsed/Double(cell_updates))" )
+print( "GFLOPS/s: \(gflops/elapsed)" )
