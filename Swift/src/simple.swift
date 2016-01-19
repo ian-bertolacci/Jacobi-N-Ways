@@ -1,8 +1,8 @@
 import Foundation
 import Glibc
 
-var N = 10
-var T = 4
+var N = 1000
+var T = 100
 
 // Parse arguments
 var arg_count = 0;
@@ -32,6 +32,14 @@ for argument in Process.arguments{
   arg_count += 1
 }
 
+var cell_updates = N * N * T
+var gflops = Double(cell_updates*5)/1e9
+
+print( "N: \(N)" )
+print( "T: \(T)" )
+print( "Cell Updates: \(cell_updates)" )
+print( "GFLOPS: \(gflops)")
+
 var grid = Array<Array<Array<Double>>>( count: 2, repeatedValue: Array<Array<Double>>(count: N+2, repeatedValue: Array<Double>(count: N+2, repeatedValue: 0.0 ) ) )
 
 let start = NSDate()
@@ -58,12 +66,6 @@ for t in 1...T {
 let end = NSDate()
 let elapsed = end.timeIntervalSinceDate( start )
 
-var cell_updates = N * N * T
-var gflops = Double(cell_updates*5)/1e9
-
-
-print( "Cell Updates: \(cell_updates)" )
-print( "GFLOPS: \(gflops)")
 print( "Elapsed: \(elapsed)s" )
-print( "Per Cell Update: \(elapsed/Double(cell_updates))" )
+print( "Per Cell Update: \(elapsed/Double(cell_updates))s" )
 print( "GFLOPS/s: \(gflops/elapsed)" )

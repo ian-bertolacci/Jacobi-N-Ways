@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <omp.h>
+#include "util.h"
 
 typedef struct _grid_struct{
   double** data;
@@ -48,10 +49,17 @@ static inline void step( Grid* source, Grid* target ){
   }
 }
 
+int main( int argc, char** argv ){
 
-int main( char** argv, int argc ){
-  int grid_size = 1000;
-  int iterations = 100;
+  struct ProgramOptions opts = parseArguments( argv, argc );
+
+  int grid_size = opts.N;
+  int iterations = opts.T;
+
+  printf( "N: %d\n", grid_size );
+  printf( "T: %d\n", iterations );
+  printf( "Cell Updates: %d\n", iterations*grid_size*grid_size );
+  printf( "GFLOPS: %f\n", (iterations*grid_size*grid_size*5)/1e9 );
 
   // allocate ping-pong grids
   Grid* grid_a = grid_alloc( grid_size );
@@ -80,8 +88,6 @@ int main( char** argv, int argc ){
   double end = omp_get_wtime();
   double elapsed = end - start;
 
-  printf( "Cell Updates: %d\n", iterations*grid_size*grid_size );
-  printf( "GFLOPS: %f\n", (iterations*grid_size*grid_size*5)/1e9 );
   printf( "Elapsed: %fs\n", elapsed );
   printf( "Per Cell Update: %fs\n", elapsed/(iterations*grid_size*grid_size) );
   printf( "GFLOPS/s: %f\n", ((iterations*grid_size*grid_size*5)/elapsed)/1e9 );

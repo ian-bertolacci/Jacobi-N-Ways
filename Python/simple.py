@@ -1,9 +1,26 @@
 import numpy as np
-import time
+import time, argparse
+
+
 
 if __name__ == "__main__":
-  N = 100
-  T = 100
+
+  parser = argparse.ArgumentParser(description='Python version of Jacobi 2D')
+  parser.add_argument( '--N', metavar="N", dest='N', type=int, action='store', default=1000)
+  parser.add_argument( '--T', metavar="T", dest='T', type=int, action='store', default=100)
+
+  args = parser.parse_args()
+
+  N = args.N
+  T = args.T
+
+  updates = ((N**2)*T)
+  gflops = (updates*5)/1e9
+
+  print "N: {0}".format( N )
+  print "T: {0}".format( T )
+  print "Cell Updates: {0}".format( updates )
+  print "GFLOPS: {0}".format( gflops )
 
   grid = [ [[0]*(N+2)]*(N+2) ]*2
   start = time.time()
@@ -19,11 +36,7 @@ if __name__ == "__main__":
 
   end = time.time()
   elapsed = end - start
-  updates = ((N**2)*T)
-  gflops = (updates*5)/1e9
 
-  print "Cell Updates: {0}".format( updates )
-  print "GFLOPS: {0}".format( gflops )
   print "Elapsed: {0}s".format( elapsed )
   print "Per Cell Update: {0}s".format( elapsed/updates )
   print "GFLOPS/s: {0}".format( gflops/elapsed )

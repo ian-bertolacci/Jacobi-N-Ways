@@ -10,7 +10,7 @@ EXES = $(BIN)/simple
 
 all: $(EXES)
 
-$(BIN)/simple: $(SRC)/simple.chpl
+$(BIN)/simple: $(BIN)/% : $(SRC)/%.chpl
 	$(CXX) $^ $(CFLGS) -o $@
 
 clean:
