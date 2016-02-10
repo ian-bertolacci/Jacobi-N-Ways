@@ -6,11 +6,14 @@ SRC=./src
 CXX=swiftc
 CFLGS = -O
 
-EXES = $(BIN)/simple
+EXES = simple
+LONG_EXES = $(addprefix $(BIN)/,$(EXES))
 
-all: $(EXES)
+all: $(LONG_EXES)
 
-$(BIN)/simple: $(BIN)/% : $(SRC)/%.swift
+$(EXES): % : $(BIN)/%
+
+$(LONG_EXES): $(BIN)/% : $(SRC)/%.swift
 	$(CXX) $^ $(CFLGS) -o $@
 
 clean:

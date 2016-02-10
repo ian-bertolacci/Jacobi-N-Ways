@@ -6,11 +6,14 @@ SRC=./src
 CXX=chpl
 CFLGS = --fast
 
-EXES = $(BIN)/simple
+EXES = simple
+LONG_EXES = $(addprefix $(BIN)/,$(EXES))
 
-all: $(EXES)
+all: $(LONG_EXES)
 
-$(BIN)/simple: $(BIN)/% : $(SRC)/%.chpl
+$(EXES): % : $(BIN)/%
+
+$(LONG_EXES): $(BIN)/% : $(SRC)/%.chpl
 	$(CXX) $^ $(CFLGS) -o $@
 
 clean:

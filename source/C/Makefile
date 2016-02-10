@@ -6,12 +6,18 @@ SRC=./src
 CXX=gcc
 CFLGS = -fopenmp
 
-EXES = $(BIN)/simple
+EXES = simple
+LONG_EXES = $(addprefix $(BIN)/,$(EXES))
 
-all: $(EXES)
+all: $(LONG_EXES)
 
-$(BIN)/simple: $(SRC)/simple.c $(BIN)/util.o
+$(EXES): % : $(BIN)/%
+
+$(LONG_EXES): $(BIN)/% : $(SRC)/%.c $(BIN)/util.o
 	$(CXX) $^ $(CFLGS) -o $@
+
+#$(BIN)/simple: $(SRC)/simple.c $(BIN)/util.o
+#	$(CXX) $^ $(CFLGS) -o $@
 
 $(BIN)/%.o : $(SRC)/%.c
 	$(CXX) $^ $(CFLGS) -c -o $@

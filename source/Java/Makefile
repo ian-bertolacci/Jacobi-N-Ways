@@ -14,9 +14,13 @@ CXX=javac
 JAR=jar
 CFLGS =
 
-EXES = $(BIN)/simple.jar
 
-all: $(EXES)
+EEXES = simple.jar
+LONG_EXES = $(addprefix $(BIN)/,$(EXES))
+
+all: $(LONG_EXES)
+
+$(EXES): % : $(BIN)/%
 
 $(BIN)/simple.jar: $(LIBS) $(SRC)/Simple_Main.java
 	$(CXX) -cp $(subst $(empty) $(empty),:,$(LIBS) $(SRC)) -d $(CLASS) $(SRC)/Simple_Main.java
