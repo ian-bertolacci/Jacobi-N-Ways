@@ -1,0 +1,84 @@
+# Description
+# Lists all languages and
+# Note:
+# can use variables to link to parent key values
+# $$some_key will be replaced by a sibling or parents key
+# $some_var is a shell variable and will __never__ be replaced
+#
+# Template
+# --- # this seperates each language entry
+# name : "Name_Of_Language"
+# root : "relative/path/to/lang/root/from/proj/dir"
+#
+# variations : # list of variations
+#   - name : "some_variation_name"
+#     path : "relative/path/to/variation/source/from/$$root"
+#     options :
+#       size :
+#         arg : "-N" # or whatever
+#         max : 10000 # optional, ints only?
+#       iterations :
+#         arg : "-T" # or whatever
+#         # max can also be used here
+#     build :
+#       directory : "relative/path/to/lang/root/from/proj/dir" #where-ever $$command needs to be executed
+#       command : "make $$name" # actual command to be executed.
+# Blank template:
+#
+# name :
+# root :
+# variations :
+#   - name :
+#     path :
+#     options :
+#       size :
+#         arg :
+#       iterations :
+#         arg :
+#     build :
+#       directory :
+#       command :
+
+name : "C"
+root : "source/C"
+variations :
+  - name : "simple"
+    path : "src"
+    options :
+      size :
+        arg : "-N"
+      iterations :
+        arg : "-T"
+    build :
+      directory : "$$root"
+      command : "make $$name"
+---
+name : "Chapel"
+root : "source/Chapel"
+variations :
+  - name : "simple"
+    path : "src"
+    options :
+      size :
+        arg : "--N"
+      iterations :
+        arg : "--T"
+    build :
+      directory : "$$root"
+      command : "make $$name"
+---
+name : "Swift"
+root : "source/swift"
+variations :
+  - name : "simple"
+    path : "src"
+    options :
+      size :
+        arg : "--N"
+        max : 100
+      iterations :
+        arg : "--T"
+        max : 1000
+    build :
+      directory : "$$root"
+      command : "make $name"
