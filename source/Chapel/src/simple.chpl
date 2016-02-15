@@ -10,8 +10,6 @@ proc main(){
 
   writeln( "N: " + N );
   writeln( "T: " + T );
-  writeln( "Cell Updates: " + T*iteration_domain.size );
-  writeln( "GFLOPS: " + (T*iteration_domain.size*5)/1e9 );
 
   var grid : [grid_domain] real(64);
 
@@ -32,7 +30,5 @@ proc main(){
   timer.stop();
 
   writeln( "Elapsed: " + timer.elapsed() + "s" );
-  writeln( "Per Cell Update: " + (timer.elapsed()/( T*iteration_domain.size )) + "s" );
-  writeln( "GFLOPS/s: " + (( T*iteration_domain.size*5 )/timer.elapsed())/1e9  );
 
 }

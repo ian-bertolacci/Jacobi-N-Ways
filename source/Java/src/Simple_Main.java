@@ -18,8 +18,6 @@ public class Simple_Main {
 
     System.out.println( "N: " + grid_size );
     System.out.println( "T: " + iterations );
-    System.out.println( "Cell Updates: " + cell_updates );
-    System.out.println( "GFLOPS: " + gflops );
 
     double[][][] grid = new double[2][grid_size+2][grid_size+2];
 
@@ -42,8 +40,6 @@ public class Simple_Main {
     double seconds = timer.getTime() / 1000.0;
 
     System.out.println( "Elapsed: " + seconds + "s" );
-    System.out.println( "Per Cell Update: " + (seconds/cell_updates) +"s" );
-    System.out.println( "GFLOPS/s: " + (gflops/seconds) );
 
   }
 

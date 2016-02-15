@@ -58,8 +58,6 @@ int main( int argc, char** argv ){
 
   printf( "N: %d\n", grid_size );
   printf( "T: %d\n", iterations );
-  printf( "Cell Updates: %d\n", iterations*grid_size*grid_size );
-  printf( "GFLOPS: %f\n", (iterations*grid_size*grid_size*5)/1e9 );
 
   // allocate ping-pong grids
   Grid* grid_a = grid_alloc( grid_size );
@@ -89,8 +87,6 @@ int main( int argc, char** argv ){
   double elapsed = end - start;
 
   printf( "Elapsed: %fs\n", elapsed );
-  printf( "Per Cell Update: %fs\n", elapsed/(iterations*grid_size*grid_size) );
-  printf( "GFLOPS/s: %f\n", ((iterations*grid_size*grid_size*5)/elapsed)/1e9 );
 
   grid_dealloc( grid_a );
   grid_dealloc( grid_b );

@@ -19,8 +19,6 @@ if __name__ == "__main__":
 
   print "N: {0}".format( N )
   print "T: {0}".format( T )
-  print "Cell Updates: {0}".format( updates )
-  print "GFLOPS: {0}".format( gflops )
 
   grid = [ [[0]*(N+2)]*(N+2) ]*2
   start = time.time()
@@ -38,5 +36,3 @@ if __name__ == "__main__":
   elapsed = end - start
 
   print "Elapsed: {0}s".format( elapsed )
-  print "Per Cell Update: {0}s".format( elapsed/updates )
-  print "GFLOPS/s: {0}".format( gflops/elapsed )

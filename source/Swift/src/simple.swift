@@ -37,8 +37,6 @@ var gflops = Double(cell_updates*5)/1e9
 
 print( "N: \(N)" )
 print( "T: \(T)" )
-print( "Cell Updates: \(cell_updates)" )
-print( "GFLOPS: \(gflops)")
 
 var grid = Array<Array<Array<Double>>>( count: 2, repeatedValue: Array<Array<Double>>(count: N+2, repeatedValue: Array<Double>(count: N+2, repeatedValue: 0.0 ) ) )
 
@@ -67,5 +65,3 @@ let end = NSDate()
 let elapsed = end.timeIntervalSinceDate( start )
 
 print( "Elapsed: \(elapsed)s" )
-print( "Per Cell Update: \(elapsed/Double(cell_updates))s" )
-print( "GFLOPS/s: \(gflops/elapsed)" )
