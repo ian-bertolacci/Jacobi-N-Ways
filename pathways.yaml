@@ -38,40 +38,58 @@
 #     build :
 #       directory :
 #       command :
+#     run:
+#       directory :
+#       command :
 
 name : "C"
 root : "source/C"
 variations :
   - name : "simple"
     path : "src"
+    flops : 5
     options :
       size :
         arg : "-N"
       iterations :
         arg : "-T"
     build :
-      directory : "$$root"
+      directory : "."
       command : "make $$name"
+    run:
+      directory : ""
+      command : "./bin/$$name"
+    clean:
+      directory : "."
+      command : "make clean"
 ---
 name : "Chapel"
 root : "source/Chapel"
 variations :
   - name : "simple"
     path : "src"
+    flops : 5
     options :
       size :
         arg : "--N"
       iterations :
         arg : "--T"
     build :
-      directory : "$$root"
+      directory : "."
       command : "make $$name"
+    run:
+      directory : "."
+      command : "./bin/$$name"
+    clean:
+      directory : "."
+      command : "make clean"
 ---
 name : "Swift"
-root : "source/swift"
+root : "source/Swift"
 variations :
   - name : "simple"
     path : "src"
+    flops : 5
     options :
       size :
         arg : "--N"
@@ -80,5 +98,11 @@ variations :
         arg : "--T"
         max : 1000
     build :
-      directory : "$$root"
-      command : "make $name"
+      directory : "."
+      command : "make $$name"
+    run:
+      directory : "."
+      command : "./bin/$$name"
+    clean:
+      directory : "."
+      command : "make clean"
