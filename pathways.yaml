@@ -7,102 +7,162 @@
 #
 # Template
 # --- # this seperates each language entry
-# name : "Name_Of_Language"
-# root : "relative/path/to/lang/root/from/proj/dir"
+# name : Name_Of_Language
+# root : relative/path/to/lang/root/from/proj/dir
+# run : True/False (optional) will run if missing of run == True
 #
 # variations : # list of variations
-#   - name : "some_variation_name"
-#     path : "relative/path/to/variation/source/from/$$root"
-#     options :
-#       size :
-#         arg : "-N" # or whatever
-#         max : 10000 # optional, ints only?
-#       iterations :
-#         arg : "-T" # or whatever
-#         # max can also be used here
-#     build :
-#       directory : "relative/path/to/lang/root/from/proj/dir" #where-ever $$command needs to be executed
-#       command : "make $$name" # actual command to be executed.
-# Blank template:
+#   - name : some_variation_name
+#     path : relative/path/to/variation/source/from/$$root
 #
+#     options : information about the size and iteration arguments
+#       size : information about the size (typically --N) argument
+#         arg : -N # or whatever
+#         max : 10000 # optional, ints only?
+#       iterations : information about the interations (typically --T) argument
+#         arg : -T # or whatever
+#         # max can also be used here
+#
+#     build : # (optional) information about building the variant
+#       directory : relative/path/to/lang/root/from/proj/dir #where-ever $$command needs to be executed
+#       command : make $$name # actual command to be executed.
+#
+#     run: information about running the variant
+#       directory : relative/path/to/lang/root/from/proj/dir #where-ever $$command needs to be executed
+#       command : ./bin/myexecutable
+#
+#     clean: (optional) information about cleaning the variant
+#       directory : relative/path/to/lang/root/from/proj/dir #where-ever $$command needs to be executed
+#       command : make clean
+#
+# Blank template:
+#---
 # name :
 # root :
+# run :
 # variations :
 #   - name :
 #     path :
+#     flops :
 #     options :
 #       size :
 #         arg :
+#         max :
 #       iterations :
 #         arg :
+#         max :
 #     build :
 #       directory :
 #       command :
 #     run:
 #       directory :
 #       command :
+#     clean:
+#       directory :
+#       command :
 
-name : "C"
-root : "source/C"
+name : C
+root : source/C
+run : True
 variations :
-  - name : "simple"
-    path : "src"
+  - name : simple
+    path : src
     flops : 5
     options :
       size :
-        arg : "-N"
+        arg : -N
       iterations :
-        arg : "-T"
+        arg : -T
     build :
-      directory : "."
-      command : "make $$name"
+      directory : $$root
+      command : make $$name
     run:
-      directory : ""
-      command : "./bin/$$name"
+      directory : $$root
+      command : ./bin/$$name
     clean:
-      directory : "."
-      command : "make clean"
+      directory : $$root
+      command : make clean
 ---
-name : "Chapel"
-root : "source/Chapel"
+name : Chapel
+root : source/Chapel
+run : True
 variations :
-  - name : "simple"
-    path : "src"
+  - name : simple
+    path : src
     flops : 5
     options :
       size :
-        arg : "--N"
+        arg : --N
       iterations :
-        arg : "--T"
+        arg : --T
     build :
-      directory : "."
-      command : "make $$name"
+      directory : $$root
+      command : make $$name
     run:
-      directory : "."
-      command : "./bin/$$name"
+      directory : $$root
+      command : ./bin/$$name
     clean:
-      directory : "."
-      command : "make clean"
+      directory : $$root
+      command : make clean
 ---
-name : "Swift"
-root : "source/Swift"
+name : Swift
+root : source/Swift
+run: False
 variations :
-  - name : "simple"
-    path : "src"
+  - name : simple
+    path : src
     flops : 5
     options :
       size :
-        arg : "--N"
+        arg : --N
         max : 100
       iterations :
-        arg : "--T"
+        arg : --T
         max : 1000
     build :
-      directory : "."
-      command : "make $$name"
+      directory : $$root
+      command : make $$name
     run:
-      directory : "."
-      command : "./bin/$$name"
+      directory : $$root
+      command : ./bin/$$name
     clean:
-      directory : "."
-      command : "make clean"
+      directory : $$root
+      command : make clean
+---
+name : Java
+root : source/Java
+run : True
+variations :
+  - name : simple
+    path : src
+    flops : 5
+    options :
+      size :
+        arg : -N
+      iterations :
+        arg : -T
+    build :
+      directory : $$root
+      command : make $$name.jar
+    run:
+      directory : $$root
+      command : java -jar ./bin/$$name.jar
+    clean:
+      directory : $$root
+      command : make clean
+---
+name : Python
+root : source/Python
+run : True
+variations :
+  - name : simple
+    path : $$root
+    flops : 5
+    options :
+      size :
+        arg : --N
+      iterations :
+        arg : --T
+    run:
+      directory : $$root
+      command : python ./$$name.py

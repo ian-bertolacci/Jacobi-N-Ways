@@ -139,9 +139,10 @@ class LanguageRunner:
     self.log.write( "[Performing '{0}' operation ]\n".format(operation) )
 
     if operation in variant_doc:
-      self.dir_stack.pushd(  "./{0}/{1}".format( self.language_doc['root'], variant_doc[operation]['directory'] )  )
+      self.dir_stack.pushd(  "./{0}/".format( variant_doc[operation]['directory'] )  )
 
       command_list = variant_doc[operation]['command'] + options
+      self.log.write( str(command_list) )
       self.log.write( "{0}\n".format( " ".join(command_list) ) )
 
       process = subprocess.Popen( command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE  )
@@ -162,10 +163,10 @@ class LanguageRunner:
       return exit_code
 
     elif not fail_if_missing :
-      self.log( "[No such operation '{0}', legally skipping]\n".format(operation) )
+      self.log.write( "[No such operation '{0}', legally skipping]\n".format(operation) )
       return 0
 
-    self.log( "[ERROR: No such operation '{0}', FAILING]\n".format(operation) )
+    self.log.write( "[ERROR: No such operation '{0}', FAILING]\n".format(operation) )
     raise Exception( "{0} is not declared in the run doc for {1}:{2}".format( operation, language_doc['name'], variant_doc['name']) )
 
   def execution_preamble( self, variant_doc, N, T ):
@@ -180,9 +181,12 @@ class LanguageRunner:
                     )
 
   def execution_postscript( self, variant_doc, N, T, elapsed ):
+
+    GFLOPSS = ((N*T*variant_doc['flops'])/10e9 )/elapsed if elapsed != 0.0 else float("inf")
+
     return "\n".join(
                       [ "Elapsed: {0}".format( elapsed ),
-                        "GFLOPS/s: {0}".format( str( ((N*T*variant_doc['flops'])/10e9 )/elapsed ) )
+                        "GFLOPS/s: {0}".format( str(GFLOPSS ) )
                       ]
                     )
 
