@@ -15,7 +15,7 @@ JAR=jar
 CFLGS =
 
 
-EEXES = simple.jar
+EXES = simple.jar
 LONG_EXES = $(addprefix $(BIN)/,$(EXES))
 
 all: $(LONG_EXES)
@@ -29,9 +29,7 @@ $(BIN)/simple.jar: $(LIBS) $(SRC)/Simple_Main.java
 	echo "Main-Class: Simple_Main" > manifest.txt ; \
 	$(foreach lib,$(LIBS),$(JAR) xf .$(lib) ; )
 	cd $(CLASS) ; \
-	$(JAR) cvfm ../$@ manifest.txt * ; \
-	cd ..
-	$(MAKE) neat
+	$(JAR) cvfm ../$@ manifest.txt *
 
 $(APACHE_LANG_3_LIB):
 	cd $(LIB); \
