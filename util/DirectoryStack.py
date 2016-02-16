@@ -47,8 +47,8 @@ class DirectoryStack:
   def pushd( self, path ):
     # Store pwd, then cd to path
     self.stack.append( os.getcwd() )
-    self.print_stack()
     os.chdir( path )
+    self.print_stack()
 
 
   def popd( self ):
