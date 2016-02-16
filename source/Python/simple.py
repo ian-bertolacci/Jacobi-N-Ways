@@ -1,7 +1,4 @@
-import numpy as np
 import time, argparse
-
-
 
 if __name__ == "__main__":
 
