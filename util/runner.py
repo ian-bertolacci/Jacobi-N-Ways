@@ -55,10 +55,11 @@ def process_document( document ):
 
 class LanguageRunner:
 
-  def __init__(self, language_doc, log_file, N_range, T_range, stdout = sys.stdout, stderr = sys.stderr ):
+  def __init__(self, language_doc, log_file, N_range, T_range, variants = [], stdout = sys.stdout, stderr = sys.stderr ):
     self.language_doc = language_doc;
     self.N_range = N_range
     self.T_range = T_range
+    self.running_variants = variants;
 
     self.log = log_file
     self.stdout = stdout
@@ -71,7 +72,8 @@ class LanguageRunner:
 
     try:
       for variant in self.language_doc['variations']:
-        self.run_variant( variant )
+        if self.running_variants == [] or variant['name'] in self.running_variants:
+          self.run_variant( variant )
 
     except:
       self.log.flush()
@@ -194,10 +196,12 @@ class LanguageRunner:
 def main():
 
   parser = argparse.ArgumentParser()
-  parser.add_argument( '--size',             dest='size',             type=int, nargs=1, metavar="Size")
-  parser.add_argument( '--size_range',       dest='size_range',       type=int, nargs=3, metavar=("start","maximum","increment") )
-  parser.add_argument( '--iterations',       dest='iterations',       type=int, nargs=1, metavar="Iterations" )
-  parser.add_argument( '--iterations_range', dest='iterations_range', type=int, nargs=3, metavar=("start","maximum","increment") )
+  parser.add_argument( '--lang',             dest='lang',             type=str, nargs=1,   metavar="Language" )
+  parser.add_argument( '--variants',         dest='vars',             type=str, nargs='+', metavar="Variant" )
+  parser.add_argument( '--size',             dest='size',             type=int, nargs=1,   metavar="Size" )
+  parser.add_argument( '--size_range',       dest='size_range',       type=int, nargs=3,   metavar=("start","maximum","increment") )
+  parser.add_argument( '--iterations',       dest='iterations',       type=int, nargs=1,   metavar="Iterations" )
+  parser.add_argument( '--iterations_range', dest='iterations_range', type=int, nargs=3,   metavar=("start","maximum","increment") )
 
   args = parser.parse_args()
 
@@ -226,6 +230,9 @@ def main():
   else:
     iterations_range = [1] # [1] + range(100,1000,50)
 
+  variants = [] if args.vars == None else args.vars
+  language = 'All' if args.lang == None else args.lang[0]
+
 
   try:
     os.remove( "./logfile.log" )
@@ -236,9 +243,8 @@ def main():
   stream = file( 'pathways.yaml', 'r' )
   for doc in yaml.load_all(stream):
     process_document(doc)
-
-    if 'run' not in doc or doc['run']:
-      test = LanguageRunner(doc, log, N_range = size_range, T_range = iterations_range)
+    if (language in [ 'All', doc['name'] ]) and ('run' not in doc or doc['run']):
+      test = LanguageRunner(doc, log, variants = variants, N_range = size_range, T_range = iterations_range)
       test.run()
 
 
