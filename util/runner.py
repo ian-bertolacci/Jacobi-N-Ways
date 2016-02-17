@@ -196,7 +196,7 @@ class LanguageRunner:
 def main():
 
   parser = argparse.ArgumentParser()
-  parser.add_argument( '--lang',             dest='lang',             type=str, nargs=1,   metavar="Language" )
+  parser.add_argument( '--langs',            dest='langs',            type=str, nargs='+', metavar="Language" )
   parser.add_argument( '--variants',         dest='vars',             type=str, nargs='+', metavar="Variant" )
   parser.add_argument( '--size',             dest='size',             type=int, nargs=1,   metavar="Size" )
   parser.add_argument( '--size_range',       dest='size_range',       type=int, nargs=3,   metavar=("start","maximum","increment") )
@@ -231,7 +231,7 @@ def main():
     iterations_range = [1] # [1] + range(100,1000,50)
 
   variants = [] if args.vars == None else args.vars
-  language = 'All' if args.lang == None else args.lang[0]
+  languages = set('All') if args.langs == None else set( args.langs )
 
 
   try:
@@ -243,7 +243,8 @@ def main():
   stream = file( 'pathways.yaml', 'r' )
   for doc in yaml.load_all(stream):
     process_document(doc)
-    if (language in [ 'All', doc['name'] ]) and ('run' not in doc or doc['run']):
+    if   ( ("All" in languages)  and ( 'run' not in doc or doc['run'] ) ) \
+      or ( doc['name'] in languages ) :
       test = LanguageRunner(doc, log, variants = variants, N_range = size_range, T_range = iterations_range)
       test.run()
 
