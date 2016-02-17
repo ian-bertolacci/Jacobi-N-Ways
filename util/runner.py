@@ -52,6 +52,29 @@ def process_stack( stack ):
 def process_document( document ):
   process_stack( [document] )
 
+class FailedBuildException( Exception ):
+  def __init__(self, language, variant, message=""):
+    super( Exception, self).__init__( "{0}:{1} failed to build{2}".format(language, variant, "!" if message == "" else ":\n{0}".format(message) ) )
+
+
+class FailedRunException( Exception ):
+  def __init__(self, language, variant):
+    super( Exception, self).__init__( "{0}:{1} failed to run{2}".format(language, variant, "!" if message == "" else ":\n{0}".format(message) ) )
+
+class FailedCleanException( Exception ):
+  def __init__(self, language, variant):
+    super( Exception, self).__init__( "{0}:{1} failed to clean{2}".format(language, variant, "!" if message == "" else ":\n{0}".format(message) ) )
+
+class ReadableOutput:
+  def __init__(self):
+    self.string = ""
+
+  def write( self, string ):
+    self.string += string
+
+  def __str__(self):
+    return self.string
+
 
 class LanguageRunner:
 
@@ -84,10 +107,13 @@ class LanguageRunner:
 
     self.log.write( "[Running variant {0}]\n".format(variant_doc['name']) )
 
-    exit_code = self.operation( variant_doc, 'build', fail_if_missing = False, stdout = sys.stdnull )
-    if exit_code < 0:
-      #TODO throw exception
-      pass
+    build_out = ReadableOutput()
+    build_err = ReadableOutput()
+
+    exit_code = self.operation( variant_doc, 'build', fail_if_missing = False, stdout = build_out, stderr = build_err )
+
+    if exit_code != 0:
+      raise FailedBuildException( self.language_doc['name'], variant_doc['name'], message = "{0}\n{1}".format( build_out, build_err ) )
 
     for iterations in self.T_range:
       if 'max' in variant_doc['options']['iterations'] and iterations > variant_doc['options']['iterations']['max']:
@@ -102,37 +128,30 @@ class LanguageRunner:
         arg_builder = lambda arg,value: [variant_doc['options'][arg]['arg'], str(value)]
         options = reduce( list.__add__, map( arg_builder, ['size','iterations'], [size,iterations] ) )
 
-        class MicroOut:
-          def __init__(self):
-            self.string = ""
-
-          def write( self, string ):
-            self.string += string
-
-          def __str__(self):
-            return self.string
-
-        output_pipe = MicroOut()
-
         self.stdout.write( self.execution_preamble( variant_doc, size, iterations ) + "\n" )
 
-        exit_code = self.operation( variant_doc, 'run', options = options, stdout = output_pipe )
+        run_out = ReadableOutput()
+        run_err = ReadableOutput()
 
-        if exit_code < 0:
-          #TODO throw exception
-          pass
+        exit_code = self.operation( variant_doc, 'run', options = options, stdout = run_out, stderr = run_err )
+
+        if exit_code != 0:
+          raise FailedRunException( self.language_doc['name'], variant_doc['name'], message = "{0}\n{1}".format( run_out, run_err ) )
 
         elapsed_rx = re.compile( r"Elapsed:\s+(?P<elapsed>[-+]?[0-9]+[.]?[0-9]*(?:[eE][-+]?[0-9]+)?)s" )
 
-        elapsed = float( elapsed_rx.search( str(output_pipe) ).group("elapsed") )
+        elapsed = float( elapsed_rx.search( str(run_out) ).group("elapsed") )
 
         self.stdout.write( self.execution_postscript( variant_doc, size, iterations, elapsed ) + "\n")
         self.stdout.write( "\n" + ("-"*10) + "\n" )
 
-    exit_code = self.operation( variant_doc, 'clean', fail_if_missing = False, stdout = sys.stdnull )
-    if exit_code < 0:
-      #TODO throw exception
-      pass
+    clean_out = ReadableOutput()
+    clean_err = ReadableOutput()
+
+    exit_code = self.operation( variant_doc, 'clean', fail_if_missing = False, stdout = clean_out, stderr = clean_err )
+
+    if exit_code != 0:
+      raise FailedCleanException( self.language_doc['name'], variant_doc['name'], message = "{0}\n{1}".format( clean_out, clean_err ) )
 
   def operation(self, variant_doc, operation, options = [], fail_if_missing = True, stdout = None, stderr = None):
     stdout = self.stdout if stdout == None else stdout
@@ -237,7 +256,7 @@ def main():
   try:
     os.remove( "./logfile.log" )
   except OSError:
-    pass
+    pass # Leave this pass. No action of failure.
 
   log = open( "./logfile.log", "w")
   stream = file( 'pathways.yaml', 'r' )
