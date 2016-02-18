@@ -91,12 +91,13 @@ class LanguageRunner:
     self.dir_stack = DirectoryStack( self.log )
 
   def run(self):
-    self.log.write( "[Running variants for {0}]\n".format(self.language_doc['name']) )
+    self.log.write( "[Running variants for {0}]\n".format(self.language_doc["name"]) )
 
     try:
-      for variant in self.language_doc['variations']:
-        if self.running_variants == [] or variant['name'] in self.running_variants:
+      for variant in self.language_doc["variations"]:
+        if self.running_variants == [] or variant["name"] in self.running_variants:
           self.run_variant( variant )
+          self.stdout.write("\n")
 
     except:
       self.log.flush()
@@ -105,53 +106,53 @@ class LanguageRunner:
 
   def run_variant(self, variant_doc ):
 
-    self.log.write( "[Running variant {0}]\n".format(variant_doc['name']) )
+    self.log.write( "[Running variant {0}]\n".format(variant_doc["name"]) )
 
     build_out = ReadableOutput()
     build_err = ReadableOutput()
 
-    exit_code = self.operation( variant_doc, 'build', fail_if_missing = False, stdout = build_out, stderr = build_err )
+    exit_code = self.operation( variant_doc, "build", fail_if_missing = False, stdout = build_out, stderr = build_err )
 
     if exit_code != 0:
-      raise FailedBuildException( self.language_doc['name'], variant_doc['name'], message = "{0}\n{1}".format( build_out, build_err ) )
+      raise FailedBuildException( self.language_doc["name"], variant_doc["name"], message = "{0}\n{1}".format( build_out, build_err ) )
 
     for iterations in self.T_range:
-      if 'max' in variant_doc['options']['iterations'] and iterations > variant_doc['options']['iterations']['max']:
-        self.log.write("[Iterations over maximum variant value: {0} > {1}]\n".format(iterations, variant_doc['options']['iterations']['max']) )
+      if "max" in variant_doc["options"]["iterations"] and iterations > variant_doc["options"]["iterations"]["max"]:
+        self.log.write("[Iterations over maximum variant value: {0} > {1}]\n".format(iterations, variant_doc["options"]["iterations"]["max"]) )
         break
 
       for size in self.N_range:
-        if 'max' in variant_doc['options']['size'] and size > variant_doc['options']['size']['max']:
-          self.log.write("[Size over maximum variant value: {0} > {1}]\n".format(size, variant_doc['options']['size']['max']) )
+        if "max" in variant_doc["options"]["size"] and size > variant_doc["options"]["size"]["max"]:
+          self.log.write("[Size over maximum variant value: {0} > {1}]\n".format(size, variant_doc["options"]["size"]["max"]) )
           break
 
-        arg_builder = lambda arg,value: [variant_doc['options'][arg]['arg'], str(value)]
-        options = reduce( list.__add__, map( arg_builder, ['size','iterations'], [size,iterations] ) )
+        arg_builder = lambda arg,value: [variant_doc["options"][arg]["arg"], str(value)]
+        options = reduce( list.__add__, map( arg_builder, ["size","iterations"], [size,iterations] ) )
 
         self.stdout.write( self.execution_preamble( variant_doc, size, iterations ) + "\n" )
 
         run_out = ReadableOutput()
         run_err = ReadableOutput()
 
-        exit_code = self.operation( variant_doc, 'run', options = options, stdout = run_out, stderr = run_err )
+        exit_code = self.operation( variant_doc, "run", options = options, stdout = run_out, stderr = run_err )
 
         if exit_code != 0:
-          raise FailedRunException( self.language_doc['name'], variant_doc['name'], message = "{0}\n{1}".format( run_out, run_err ) )
+          raise FailedRunException( self.language_doc["name"], variant_doc["name"], message = "{0}\n{1}".format( run_out, run_err ) )
 
         elapsed_rx = re.compile( r"Elapsed:\s+(?P<elapsed>[-+]?[0-9]+[.]?[0-9]*(?:[eE][-+]?[0-9]+)?)s" )
 
         elapsed = float( elapsed_rx.search( str(run_out) ).group("elapsed") )
 
         self.stdout.write( self.execution_postscript( variant_doc, size, iterations, elapsed ) + "\n")
-        self.stdout.write( "\n" + ("-"*10) + "\n" )
+
 
     clean_out = ReadableOutput()
     clean_err = ReadableOutput()
 
-    exit_code = self.operation( variant_doc, 'clean', fail_if_missing = False, stdout = clean_out, stderr = clean_err )
+    exit_code = self.operation( variant_doc, "clean", fail_if_missing = False, stdout = clean_out, stderr = clean_err )
 
     if exit_code != 0:
-      raise FailedCleanException( self.language_doc['name'], variant_doc['name'], message = "{0}\n{1}".format( clean_out, clean_err ) )
+      raise FailedCleanException( self.language_doc["name"], variant_doc["name"], message = "{0}\n{1}".format( clean_out, clean_err ) )
 
   def operation(self, variant_doc, operation, options = [], fail_if_missing = True, stdout = None, stderr = None):
     stdout = self.stdout if stdout == None else stdout
@@ -160,9 +161,9 @@ class LanguageRunner:
     self.log.write( "[Performing '{0}' operation ]\n".format(operation) )
 
     if operation in variant_doc:
-      self.dir_stack.pushd(  "./{0}/".format( variant_doc[operation]['directory'] )  )
+      self.dir_stack.pushd(  "./{0}/".format( variant_doc[operation]["directory"] )  )
 
-      command_list = variant_doc[operation]['command'] + options
+      command_list = variant_doc[operation]["command"] + options
       self.log.write( str(command_list) )
       self.log.write( "{0}\n".format( " ".join(command_list) ) )
 
@@ -188,22 +189,22 @@ class LanguageRunner:
       return 0
 
     self.log.write( "[ERROR: No such operation '{0}', FAILING]\n".format(operation) )
-    raise Exception( "{0} is not declared in the run doc for {1}:{2}".format( operation, language_doc['name'], variant_doc['name']) )
+    raise Exception( "{0} is not declared in the run doc for {1}:{2}".format( operation, language_doc["name"], variant_doc["name"]) )
 
   def execution_preamble( self, variant_doc, N, T ):
     return "\n".join(
-                      [ "Language: {0}".format( self.language_doc['name'] ),
-                        "Variant: {0}".format( variant_doc['name'] ),
+                      [ "Language: {0}".format( self.language_doc["name"] ),
+                        "Variant: {0}".format( variant_doc["name"] ),
                         "Size: {0}".format( str(N) ),
                         "Iterations: {0}".format( str(T) ),
                         "Cell Updates: {0}".format( str(N*T) ),
-                        "GFLOPS: {0}".format( str( (N*T*variant_doc['flops'])/10e9 ) )
+                        "GFLOPS: {0}".format( str( (N*T*variant_doc["flops"])/10e9 ) )
                       ]
                     )
 
   def execution_postscript( self, variant_doc, N, T, elapsed ):
 
-    GFLOPSS = ((N*T*variant_doc['flops'])/10e9 )/elapsed if elapsed != 0.0 else float("inf")
+    GFLOPSS = ((N*T*variant_doc["flops"])/10e9 )/elapsed if elapsed != 0.0 else float("inf")
 
     return "\n".join(
                       [ "Elapsed: {0}".format( elapsed ),
@@ -215,12 +216,12 @@ class LanguageRunner:
 def main():
 
   parser = argparse.ArgumentParser()
-  parser.add_argument( '--langs',            dest='langs',            type=str, nargs='+', metavar="Language" )
-  parser.add_argument( '--variants',         dest='vars',             type=str, nargs='+', metavar="Variant" )
-  parser.add_argument( '--size',             dest='size',             type=int, nargs=1,   metavar="Size" )
-  parser.add_argument( '--size_range',       dest='size_range',       type=int, nargs=3,   metavar=("start","maximum","increment") )
-  parser.add_argument( '--iterations',       dest='iterations',       type=int, nargs=1,   metavar="Iterations" )
-  parser.add_argument( '--iterations_range', dest='iterations_range', type=int, nargs=3,   metavar=("start","maximum","increment") )
+  parser.add_argument( "--langs",            dest="langs",            type=str, nargs="+", metavar="Language" )
+  parser.add_argument( "--variants",         dest="vars",             type=str, nargs="+", metavar="Variant" )
+  parser.add_argument( "--size",             dest="size",             type=int, nargs=1,   metavar="Size" )
+  parser.add_argument( "--size_range",       dest="size_range",       type=int, nargs=3,   metavar=("start","maximum","increment") )
+  parser.add_argument( "--iterations",       dest="iterations",       type=int, nargs=1,   metavar="Iterations" )
+  parser.add_argument( "--iterations_range", dest="iterations_range", type=int, nargs=3,   metavar=("start","maximum","increment") )
 
   args = parser.parse_args()
 
@@ -234,7 +235,7 @@ def main():
   elif args.size_range != None:
     size_range = xrange( args.size_range[0], args.size_range[1]+1, args.size_range[2] )
   else:
-    size_range = [3] # xrange(100,1000,100)
+    size_range = xrange(100,1000,100)
 
   if args.iterations != None and args.iterations_range != None:
     print("Incompatable flags --iterations and --iterations_range were used")
@@ -247,10 +248,10 @@ def main():
     iterations_range = xrange( args.iterations_range[0], args.iterations_range[1]+1, args.iterations_range[2] )
 
   else:
-    iterations_range = [1] # [1] + range(100,1000,50)
+    iterations_range = [1] + range(100,1000,50)
 
   variants = [] if args.vars == None else args.vars
-  languages = set('All') if args.langs == None else set( args.langs )
+  languages = set(["All"]) if args.langs == None else set( args.langs )
 
 
   try:
@@ -259,11 +260,11 @@ def main():
     pass # Leave this pass. No action of failure.
 
   log = open( "./logfile.log", "w")
-  stream = file( 'pathways.yaml', 'r' )
+  stream = file( "pathways.yaml", "r" )
   for doc in yaml.load_all(stream):
     process_document(doc)
-    if   ( ("All" in languages)  and ( 'run' not in doc or doc['run'] ) ) \
-      or ( doc['name'] in languages ) :
+    if   ( ("All" in languages)  and ( "run" not in doc or doc["run"] ) ) \
+      or ( doc["name"] in languages ) :
       test = LanguageRunner(doc, log, variants = variants, N_range = size_range, T_range = iterations_range)
       test.run()
 

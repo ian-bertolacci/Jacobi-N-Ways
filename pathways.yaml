@@ -107,7 +107,7 @@ variations :
 ---
 name : Swift
 root : source/Swift
-run: False
+run: True
 variations :
   - name : simple
     path : src
