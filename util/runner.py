@@ -97,7 +97,6 @@ class LanguageRunner:
       for variant in self.language_doc["variations"]:
         if self.running_variants == [] or variant["name"] in self.running_variants:
           self.run_variant( variant )
-          self.stdout.write("\n")
 
     except:
       self.log.flush()
@@ -143,7 +142,7 @@ class LanguageRunner:
 
         elapsed = float( elapsed_rx.search( str(run_out) ).group("elapsed") )
 
-        self.stdout.write( self.execution_postscript( variant_doc, size, iterations, elapsed ) + "\n")
+        self.stdout.write( self.execution_postscript( variant_doc, size, iterations, elapsed ) + "\n" + ("="*10) + "\n")
 
 
     clean_out = ReadableOutput()
@@ -261,10 +260,14 @@ def main():
 
   log = open( "./logfile.log", "w")
   stream = file( "pathways.yaml", "r" )
+  first_bar = True
   for doc in yaml.load_all(stream):
     process_document(doc)
     if   ( ("All" in languages)  and ( "run" not in doc or doc["run"] ) ) \
       or ( doc["name"] in languages ) :
+      if first_bar:
+        sys.stdout.write( ("="*10) + "\n" )
+        first_bar = False
       test = LanguageRunner(doc, log, variants = variants, N_range = size_range, T_range = iterations_range)
       test.run()
 
