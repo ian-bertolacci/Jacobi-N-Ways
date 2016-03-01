@@ -20,10 +20,10 @@ proc main(){
   for t in 1..T {
     var read = t & 1;
     var write = 1 - read;
-    for (i,j) in iteration_domain{
-      grid[write,i,j] = ( grid[read,i,j] +
-                          grid[read,i+1,j] + grid[read,i,j+1] +
-                          grid[read,i-1,j] + grid[read,i,j-1] ) / 5;
+    for (x,y) in iteration_domain{
+      grid[write,x,y] = ( grid[read,x,y] +
+                          grid[read,x+1,y] + grid[read,x,y+1] +
+                          grid[read,x-1,y] + grid[read,x,y-1] ) / 5;
     }
   }
 
