@@ -1,0 +1,9 @@
+[package]
+name = "jacobi_2D_Serial"
+version = "0.0.1"
+authors = [ "Ian J. Bertolacci <ian.bertolacci@gmail.com>"]
+
+[dependencies]
+argparse = "*"
+num = "0.1"
+stopwatch="*"

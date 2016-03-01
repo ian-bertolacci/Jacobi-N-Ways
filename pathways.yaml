@@ -118,6 +118,28 @@ variations :
       directory : $$root
       command : make clean
 ---
+name : rust
+root : source/Rust
+run : True
+variations :
+  - name : jacobi_2D_Serial
+    path : jacobi_2D_Serial
+    flops : 5
+    options :
+      size :
+        arg : --grid_size
+      iterations :
+        arg : --time_steps
+    build :
+      directory : $$root/$$path
+      command : cargo build --release
+    run:
+      directory : $$root/$$path
+      command : ./target/release/$$name
+    clean:
+      directory : $$root/$$path
+      command : cargo clean
+---
 name : C
 root : source/C
 run : False

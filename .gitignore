@@ -34,3 +34,7 @@
 
 # Log files
 *.log
+
+# Rust trash
+Cargo.lock
+target/*
