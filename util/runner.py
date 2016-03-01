@@ -58,11 +58,11 @@ class FailedBuildException( Exception ):
 
 
 class FailedRunException( Exception ):
-  def __init__(self, language, variant):
+  def __init__(self, language, variant, message=""):
     super( Exception, self).__init__( "{0}:{1} failed to run{2}".format(language, variant, "!" if message == "" else ":\n{0}".format(message) ) )
 
 class FailedCleanException( Exception ):
-  def __init__(self, language, variant):
+  def __init__(self, language, variant, message=""):
     super( Exception, self).__init__( "{0}:{1} failed to clean{2}".format(language, variant, "!" if message == "" else ":\n{0}".format(message) ) )
 
 class ReadableOutput:
