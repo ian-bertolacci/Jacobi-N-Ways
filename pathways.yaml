@@ -61,33 +61,11 @@
 #       directory :
 #       command :
 
-name : C
-root : source/C
-run : True
-variations :
-  - name : simple
-    path : src
-    flops : 5
-    options :
-      size :
-        arg : -N
-      iterations :
-        arg : -T
-    build :
-      directory : $$root
-      command : make $$name
-    run:
-      directory : $$root
-      command : ./bin/$$name
-    clean:
-      directory : $$root
-      command : make clean
----
 name : Chapel
 root : source/Chapel
 run : True
 variations :
-  - name : simple
+  - name : jacobi_2D_Serial
     path : src
     flops : 5
     options :
@@ -104,21 +82,32 @@ variations :
     clean:
       directory : $$root
       command : make clean
----
-name : Swift
-root : source/Swift
-run: True
-variations :
-  - name : simple
+  - name : jacobi_3D_Serial
     path : src
-    flops : 5
+    flops : 7
     options :
       size :
         arg : --N
-        max : 100
+        max : 500
       iterations :
         arg : --T
-        max : 1000
+    build :
+      directory : $$root
+      command : make $$name
+    run:
+      directory : $$root
+      command : ./bin/$$name
+    clean:
+      directory : $$root
+      command : make clean
+  - name : gameOfLife_Serial
+    path : src
+    flops : 8 #10?
+    options :
+      size :
+        arg : --N
+      iterations :
+        arg : --T
     build :
       directory : $$root
       command : make $$name
@@ -129,9 +118,9 @@ variations :
       directory : $$root
       command : make clean
 ---
-name : Java
-root : source/Java
-run : True
+name : C
+root : source/C
+run : False
 variations :
   - name : simple
     path : src
@@ -143,26 +132,10 @@ variations :
         arg : -T
     build :
       directory : $$root
-      command : make $$name.jar
+      command : make $$name
     run:
       directory : $$root
-      command : java -jar ./bin/$$name.jar
+      command : ./bin/$$name
     clean:
       directory : $$root
       command : make clean
----
-name : Python
-root : source/Python
-run : True
-variations :
-  - name : simple
-    path : $$root
-    flops : 5
-    options :
-      size :
-        arg : --N
-      iterations :
-        arg : --T
-    run:
-      directory : $$root
-      command : python ./$$name.py
