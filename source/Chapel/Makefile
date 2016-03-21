@@ -9,7 +9,8 @@ CFLGS = --fast
 EXES = jacobi_2D_Serial \
 			 jacobi_3D_Serial \
 			 jacobi_2D_Naive_Parallel \
-			 jacobi_3D_Naive_Parallel
+			 jacobi_3D_Naive_Parallel \
+			 jacobi_2D_Space_Tiling
 
 LONG_EXES = $(addprefix $(BIN)/,$(EXES))
 
