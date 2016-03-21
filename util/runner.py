@@ -128,7 +128,7 @@ class LanguageRunner:
         arg_builder = lambda arg,value: [variant_doc["options"][arg]["arg"], str(value)]
         options = reduce( list.__add__, map( arg_builder, ["size","iterations"], [size,iterations] ) )
 
-        self.stdout.write( self.execution_preamble( variant_doc, size, iterations ) + "\n" )
+        self.stdout.write( self.execution_preamble( variant_doc, size, iterations) + "\n" )
 
         run_out = ReadableOutput()
         run_err = ReadableOutput()
@@ -191,13 +191,17 @@ class LanguageRunner:
     raise Exception( "{0} is not declared in the run doc for {1}:{2}".format( operation, language_doc["name"], variant_doc["name"]) )
 
   def execution_preamble( self, variant_doc, N, T ):
+    cells = N**int(variant_doc["dimension"])
+    updates = cells * T
+
     return "\n".join(
                       [ "Language: {0}".format( self.language_doc["name"] ),
                         "Variant: {0}".format( variant_doc["name"] ),
                         "Size: {0}".format( str(N) ),
+                        "Cells: {0}".format( str(cells) ),
                         "Iterations: {0}".format( str(T) ),
-                        "Cell Updates: {0}".format( str(N*T) ),
-                        "GFLOPS: {0}".format( str( (N*T*variant_doc["flops"])/10e9 ) )
+                        "Cell Updates: {0}".format( str(updates) ),
+                        "GFLOPS: {0}".format( str( (updates*variant_doc["flops"])/10e9 ) )
                       ]
                     )
 

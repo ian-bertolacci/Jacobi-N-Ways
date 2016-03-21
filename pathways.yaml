@@ -68,6 +68,7 @@ variations :
   - name : jacobi_2D_Serial
     path : src
     flops : 5
+    dimension : 2
     options :
       size :
         arg : --N
@@ -85,27 +86,11 @@ variations :
   - name : jacobi_3D_Serial
     path : src
     flops : 7
+    dimension : 3
     options :
       size :
         arg : --N
         max : 500
-      iterations :
-        arg : --T
-    build :
-      directory : $$root
-      command : make $$name
-    run:
-      directory : $$root
-      command : ./bin/$$name
-    clean:
-      directory : $$root
-      command : make clean
-  - name : gameOfLife_Serial
-    path : src
-    flops : 8 #10?
-    options :
-      size :
-        arg : --N
       iterations :
         arg : --T
     build :
@@ -125,6 +110,7 @@ variations :
   - name : jacobi_2D_Serial
     path : jacobi_2D_Serial
     flops : 5
+    dimension : 2
     options :
       size :
         arg : --grid_size
@@ -147,6 +133,7 @@ variations :
   - name : simple
     path : src
     flops : 5
+    dimension : 2
     options :
       size :
         arg : -N
@@ -161,3 +148,33 @@ variations :
     clean:
       directory : $$root
       command : make clean
+---
+name : Julia
+root : source/Julia
+run : True
+variations :
+  - name : jacobi_2D_Serial
+    path : .
+    flops : 5
+    dimension : 2
+    options :
+      size :
+        arg : --N
+      iterations :
+        arg : --T
+    run:
+      directory : $$root
+      command : julia $$name.jl
+  - name : jacobi_3D_Serial
+    path : .
+    flops : 7
+    dimension : 3
+    options :
+      size :
+        arg : --N
+        max : 50
+      iterations :
+        arg : --T
+    run:
+      directory : $$root
+      command : julia $$name.jl
