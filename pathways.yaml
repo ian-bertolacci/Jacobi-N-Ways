@@ -65,6 +65,7 @@ name : Chapel
 root : source/Chapel
 run : True
 variations :
+
   - name : jacobi_2D_Serial
     path : src
     flops : 5
@@ -83,6 +84,7 @@ variations :
     clean:
       directory : $$root
       command : make clean
+
   - name : jacobi_3D_Serial
     path : src
     flops : 7
@@ -102,6 +104,7 @@ variations :
     clean:
       directory : $$root
       command : make clean
+
   - name : jacobi_2D_Naive_Parallel
     path : src
     flops : 5
@@ -120,6 +123,7 @@ variations :
     clean:
       directory : $$root
       command : make clean
+
   - name : jacobi_3D_Naive_Parallel
     path : src
     flops : 7
@@ -140,10 +144,11 @@ variations :
       directory : $$root
       command : make clean
 ---
-name : rust
+name : Rust
 root : source/Rust
 run : True
 variations :
+
   - name : jacobi_2D_Serial
     path : jacobi_2D_Serial
     flops : 5
@@ -162,11 +167,32 @@ variations :
     clean:
       directory : $$root/$$path
       command : cargo clean
+
+  - name : jacobi_3D_Serial
+    path : jacobi_3D_Serial
+    flops : 7
+    dimension : 3
+    options :
+      size :
+        arg : --grid_size
+        max : 500
+      iterations :
+        arg : --time_steps
+    build :
+      directory : $$root/$$path
+      command : cargo build --release
+    run:
+      directory : $$root/$$path
+      command : ./target/release/$$name
+    clean:
+      directory : $$root/$$path
+      command : cargo clean
 ---
 name : C
 root : source/C
 run : False
 variations :
+
   - name : simple
     path : src
     flops : 5
@@ -190,6 +216,7 @@ name : Julia
 root : source/Julia
 run : True
 variations :
+
   - name : jacobi_2D_Serial
     path : .
     flops : 5
@@ -202,6 +229,7 @@ variations :
     run:
       directory : $$root
       command : julia --optimize $$name.jl
+
   - name : jacobi_3D_Serial
     path : .
     flops : 7
