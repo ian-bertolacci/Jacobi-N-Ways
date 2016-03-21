@@ -19,6 +19,8 @@ parsed_args = parse_args(ARGS, s)
 N = parsed_args["N"]
 T = parsed_args["T"]
 
+println( "N: $N\nT: $T" )
+
 grid_r = Grid2D( N, 1.0 )
 
 for x in grid_r.range
