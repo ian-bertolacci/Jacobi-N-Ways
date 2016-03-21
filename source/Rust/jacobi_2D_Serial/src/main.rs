@@ -60,6 +60,8 @@ fn main() {
     None => 1000
   };
 
+  println!( "N: {}\nT: {}", grid_size, time_steps );
+
   let mut grid_a : Grid<i32> = Grid::new( grid_size );
   let mut grid_b : Grid<i32> = Grid::new( grid_size );
 
