@@ -5,7 +5,6 @@ config var T = 100;
 
 config var tile_size = N / ( if dataParTasksPerLocale != 0 then dataParTasksPerLocale else here.numCores );
 var tiles = max( ceil( (1.0*N) / tile_size) : int, 1); // If tile_size unset === cores/dataParTasks
-//writeln( (tile_size, tiles*tiles)  );
 
 proc main(){
 
@@ -25,6 +24,7 @@ proc main(){
   for t in 1..T {
     const read = t & 1;
     const write = 1 - read;
+    // Tiling loop (Hand collapsed)
     forall tile_ in 0..#tiles*tiles {
       const tile_x = tile_ / tiles;
       const tile_y = tile_ % tiles;
