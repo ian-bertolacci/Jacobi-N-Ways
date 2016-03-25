@@ -190,16 +190,74 @@ variations :
 ---
 name : C
 root : source/C
-run : False
+run : True
 variations :
 
-  - name : simple
+  - name : jacobi_2D_Serial
     path : src
     flops : 5
     dimension : 2
     options :
       size :
         arg : -N
+      iterations :
+        arg : -T
+    build :
+      directory : $$root
+      command : make $$name
+    run:
+      directory : $$root
+      command : ./bin/$$name
+    clean:
+      directory : $$root
+      command : make clean
+
+  - name : jacobi_3D_Serial
+    path : src
+    flops : 7
+    dimension : 2
+    options :
+      size :
+        arg : -N
+      iterations :
+        arg : -T
+    build :
+      directory : $$root
+      command : make $$name
+    run:
+      directory : $$root
+      command : ./bin/$$name
+    clean:
+      directory : $$root
+      command : make clean
+
+  - name : jacobi_2D_Naive_Parallel
+    path : src
+    flops : 5
+    dimension : 2
+    options :
+      size :
+        arg : -N
+      iterations :
+        arg : -T
+    build :
+      directory : $$root
+      command : make $$name
+    run:
+      directory : $$root
+      command : ./bin/$$name
+    clean:
+      directory : $$root
+      command : make clean
+
+  - name : jacobi_3D_Naive_Parallel
+    path : src
+    flops : 5
+    dimension : 2
+    options :
+      size :
+        arg : -N
+        max : 500
       iterations :
         arg : -T
     build :
