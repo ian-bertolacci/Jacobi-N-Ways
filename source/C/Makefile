@@ -6,7 +6,12 @@ SRC=./src
 CXX=gcc
 CFLGS = -fopenmp
 
-EXES = simple
+EXES = simple \
+			 jacobi_2D_Serial \
+			 jacobi_3D_Serial \
+			 jacobi_2D_Naive_Parallel \
+			 jacobi_3D_Naive_Parallel
+
 LONG_EXES = $(addprefix $(BIN)/,$(EXES))
 
 all: $(LONG_EXES)

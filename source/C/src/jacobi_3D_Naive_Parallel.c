@@ -6,16 +6,19 @@
 #include "util.h"
 
 typedef struct _grid_struct{
-  double** data;
+  double*** data;
   int size;
 } Grid;
 
 Grid* grid_alloc( int grid_size ){
   Grid* result = (Grid*) malloc( sizeof(Grid) );
 
-  result->data = malloc( (grid_size+2) * sizeof( double* ) );
+  result->data = malloc( (grid_size+2) * sizeof( double** ) );
   for( int i = 0; i <= grid_size+1; i += 1 ){
-    result->data[i] = calloc( grid_size+2, sizeof( double ) );
+    result->data[i] = calloc( grid_size+2, sizeof( double* ) );
+    for( int j = 0; j <= grid_size+1; j += 1 ){
+      result->data[i][j] = calloc( grid_size+2, sizeof( double ) );
+    }
   }
 
   result->size = grid_size;
@@ -24,6 +27,9 @@ Grid* grid_alloc( int grid_size ){
 
 void grid_dealloc( Grid* grid ){
   for( int i = 0; i <= grid->size+1; i += 1 ){
+    for( int j = 0; j <= grid->size+1; j += 1 ){
+        free( grid->data[i][j] );
+    }
     free( grid->data[i] );
   }
   free( grid->data );
@@ -34,17 +40,22 @@ void populate_grid( Grid* grid ){
   srand (time(NULL));
   for( int i = 1; i <= grid->size; i += 1 ){
     for( int j = 1; j <= grid->size; j += 1 ){
-      grid->data[i][j] = rand();
+      for( int k = 1; k <= grid->size; k += 1 ){
+        grid->data[i][j][k] = rand();
+      }
     }
   }
 }
 
 static inline void step( Grid* source, Grid* target ){
+  #pragma omp parallel for
   for( int i = 1; i <= source->size; i += 1 ){
     for( int j = 1; j <= source->size; j += 1 ){
-      target->data[i][j] = ( source->data[i][j] +
-                             source->data[i+1][j] + source->data[i][j+1] +
-                             source->data[i-1][j] + source->data[i][j-1] ) / 5;
+      for( int k = 1; k <= source->size; k += 1 ){
+        target->data[i][j][k] = ( source->data[i][j][k] +
+                                  source->data[i+1][j][k] + source->data[i][j+1][k] + source->data[i][j][k+1] +
+                                  source->data[i-1][j][k] + source->data[i][j-1][k] + source->data[i][j][k-1] ) / 7.0;
+      }
     }
   }
 }
@@ -60,36 +71,30 @@ int main( int argc, char** argv ){
   printf( "T: %d\n", iterations );
 
   // allocate ping-pong grids
-  Grid* grid_a = grid_alloc( grid_size );
-  Grid* grid_b = grid_alloc( grid_size );
+  Grid* grid_r = grid_alloc( grid_size );
+  Grid* grid_w = grid_alloc( grid_size );
   Grid* result = NULL;
 
-  populate_grid( grid_a );
+  populate_grid( grid_r );
 
   double start = omp_get_wtime();
 
   // Do steps in pairs
-  for( int t = 0; t < iterations; t += 2 ){
-    step( grid_a, grid_b );
-    step( grid_b, grid_a );
+  for( int t = 0; t < iterations; t += 1 ){
+    step( grid_r, grid_w );
+    result = grid_w;
+    grid_w = grid_r;
+    grid_r = result;
   }
 
-  // Set result
-  // if odd number of iterations, do remainder
-  if( iterations & 1 == 1 ){
-    step( grid_a, grid_b );
-    result = grid_b;
-  } else {
-    result = grid_a;
-  }
 
   double end = omp_get_wtime();
   double elapsed = end - start;
 
   printf( "Elapsed: %fs\n", elapsed );
 
-  grid_dealloc( grid_a );
-  grid_dealloc( grid_b );
+  grid_dealloc( grid_r );
+  grid_dealloc( grid_w );
 
   return 0;
 }
