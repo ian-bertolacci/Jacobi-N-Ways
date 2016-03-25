@@ -35,6 +35,9 @@
 # Log files
 *.log
 
+# Binary folders
+*/bin/*
+
 # Rust trash
 Cargo.lock
 Rust/*/target/
