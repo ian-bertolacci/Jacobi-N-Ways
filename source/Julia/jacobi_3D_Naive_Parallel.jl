@@ -24,7 +24,7 @@ grid_w = zeros( Float64, N+2, N+2, N+2 )
 
 tic()
 for t in 1:T
-  for x in 2:N+1
+  @sync @parallel for x in 2:N+1
     for y in 2:N+1
       for z in 2:N+1
         grid_w[x,y,z] = (grid_r[x,y,z] + grid_r[x-1,y,z] + grid_r[x,y-1,z] + grid_r[x,y,z-1] +
