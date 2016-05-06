@@ -1,0 +1,11 @@
+[package]
+name = "jacobi_2D_Naive_Parallel"
+version = "0.0.1"
+authors = [ "Ian J. Bertolacci <ian.bertolacci@gmail.com>"]
+
+[dependencies]
+argparse = "*"
+num = "0.1"
+stopwatch="*"
+rand = "0.3"
+num_cpus = "0.2.11"
