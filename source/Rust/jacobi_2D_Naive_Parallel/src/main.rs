@@ -294,27 +294,6 @@ impl PartialEq for Domain {
   }
 }
 
-/*
-fn apply_stencil( domain: &Domain, write : &mut Grid, read : &Grid, operation: &Fn(&Grid,i64,i64)->f64 ){
-  assert!( write.domain == read.domain );
-  assert!( domain.is_strict_subdomain( &(read.domain) ) );
-  assert!( domain.dim == 2 );
-
-  apply_stencil_no_check( domain, write, read, operation );
-}
-
-fn apply_stencil_no_check( domain: &Domain, write : &mut Grid, read : &Grid, operation: &Fn(&Grid,i64,i64)->f64 ){
-
-
-  for i in domain.dim_range(0){
-    for j in domain.dim_range(1){
-        let a = operation(read, i, j);
-        write.grid[ write.domain.flat_idx(&[i,j]) ] = a;
-    }
-  }
-}
-*/
-
 fn wrap<T: Clone>( vec : &Vec<T> ) -> Vec<Arc<Mutex<T>>> {
   let mut ret = Vec::new();
   for idx in 0..vec.len() {
@@ -372,40 +351,6 @@ fn main() {
     None => 4
   };
 
-  /*
-  let grid_domain = Domain::new_from_ranges( &vec![ (0..grid_size as i64), (0..grid_size as i64) ] );
-  let iter_domain = Domain::new_from_ranges( &vec![ (1..(grid_size as i64)-1), (1..(grid_size as i64)-1) ] );
-  let mut grid = Grid::new_from_domain( &grid_domain, &iter_domain );
-
-  let mut i = 1;
-  for idx in grid.iter_domain.iter(){
-    grid.grid[ grid.domain.flat_idx( &idx[..] ) ] = i as f64;
-    i += 1;
-  }
-
-  for x in grid.domain.dim_range(0){
-    for y in grid.domain.dim_range(0){
-      print!("{} ", grid.grid[ grid.domain.flat_idx( &[x,y] ) ] );
-    }
-    println!("");
-  }
-  println!("------------------------------------");
-
-  let mut part_grid = PartitionedGrid::new_from_grid( &grid, 2);
-
-  let mut i = 0;
-  for mut subgrid in part_grid.grids {
-    println!("subgrid {}", i);
-    i += 1;
-    for idx in subgrid.iter_domain.iter(){
-      subgrid.grid[ subgrid.domain.flat_idx( &idx[..] ) ] += subgrid.grid[ subgrid.domain.flat_idx( &idx[..] ) ] ;
-      print!("{} ", subgrid.grid[ subgrid.domain.flat_idx( &idx[..] ) ]);
-    }
-    println!("\n====================================================")
-  }
-  */
-
-
   println!( "N: {}\nT: {}", grid_size, time_steps );
 
   let grid_domain = Domain::new_from_ranges( &vec![ (0..grid_size as i64), (0..grid_size as i64) ] );
@@ -435,14 +380,11 @@ fn main() {
     let mut children = vec![];
 
     for thread_id in 0..wrapped.len(){
-      //println!("Thread {} prepping.", thread_id);
       let write = wrapped[thread_id].clone();
       let read = read.clone();
       children.push( thread::spawn(
         move | | {
-          //println!("Thread {} waiting.", thread_id);
           let mut write = &mut *write.lock().unwrap();
-          //println!("Thread {} working.", thread_id);
           for idx in write.iter_domain.iter(){
             let x = idx[0];
             let y = idx[1];
@@ -454,73 +396,20 @@ fn main() {
               + read.grid[ read.domain.flat_idx(&[x  ,y-1]) ]
               + read.grid[ read.domain.flat_idx(&[x  ,y+1]) ] ) * 0.2;
           }
-          //thread::sleep(Duration::new(1, 0));
-          //println!("Thread {} done.", thread_id);
         } // thread
       ));
     } // for thread_id
 
-    //println!("Main thread joining.");
     for child in children {
         // Wait for the thread to finish. Returns a result.
         let _ = child.join();
     }
-    //println!("Threads Joined");
     part_grid.grids = unwrap( wrapped );
     write = Grid::new_from_partitioned_grid( &part_grid );
-    //println!("Swapping");
+
     mem::swap(&mut read, &mut write);
 
-    for x in read.domain.dim_range(0){
-      for y in read.domain.dim_range(0){
-        print!("{}\t", read.grid[ read.domain.flat_idx( &[x,y] ) ] );
-      }
-      println!("");
-    }
-    println!("=======================================");
   } // for t
 
-  // */
-  /*
-  let mut grid_read = vec![0.0; grid_size+2];
-  let mut grid_write = vec![0.0; grid_size+2];
 
-  let mut rng = rand::thread_rng();
-  for x in 1..grid_size {
-    grid_read[x] = rng.gen::<f64>();
-    grid_write[x] = grid_read[x];
-  }
-
-  let mut data_read = Arc::new( Mutex::new( grid_read ) );
-  let mut data_write = Arc::new( Mutex::new( grid_write ) );
-
-
-  let num_threads = num_cpus::get();
-  let span = (((grid_size-2) as f64)/(num_threads as f64)).ceil() as usize ;
-
-  let mut timer = Stopwatch::new();
-
-  timer.start();
-
-  for t in 1..time_steps{
-
-    let mut children = vec![];
-
-    for thread in 0..num_threads-1 {
-
-
-    }
-
-    for child in children {
-        // Wait for the thread to finish. Returns a result.
-        let _ = child.join();
-    }
-    mem::swap(&mut data_read, &mut data_write);
-
-  }
-
-  timer.stop();
-
-  println!("Elapsed: {}s", (timer.elapsed().num_nanoseconds().unwrap() as f64)/1e9 );
-  */
 }
