@@ -31,10 +31,11 @@ void grid_dealloc( Grid* grid ){
 }
 
 void populate_grid( Grid* grid ){
-  srand (time(NULL));
+  double val = 1.0;
   for( int i = 1; i <= grid->size; i += 1 ){
     for( int j = 1; j <= grid->size; j += 1 ){
-      grid->data[i][j] = rand();
+      grid->data[i][j] = val;
+      val += 1.0;
     }
   }
 }
@@ -62,7 +63,7 @@ int main( int argc, char** argv ){
   // allocate ping-pong grids
   Grid* grid_r = grid_alloc( grid_size );
   Grid* grid_w = grid_alloc( grid_size );
-  Grid* result = NULL;
+  Grid* result = grid_r;
 
   populate_grid( grid_r );
 

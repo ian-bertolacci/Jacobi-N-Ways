@@ -31,10 +31,11 @@ void grid_dealloc( Grid* grid ){
 }
 
 void populate_grid( Grid* grid ){
-  srand (time(NULL));
+  double val = 1.0;
   for( int i = 1; i <= grid->size; i += 1 ){
     for( int j = 1; j <= grid->size; j += 1 ){
-      grid->data[i][j] = rand();
+      grid->data[i][j] = val;
+      val += 1.0;
     }
   }
 }
@@ -63,7 +64,7 @@ int main( int argc, char** argv ){
   // allocate ping-pong grids
   Grid* grid_r = grid_alloc( grid_size );
   Grid* grid_w = grid_alloc( grid_size );
-  Grid* result = NULL;
+  Grid* result = grid_r;
 
   populate_grid( grid_r );
 
@@ -82,6 +83,48 @@ int main( int argc, char** argv ){
   double elapsed = end - start;
 
   printf( "Elapsed: %fs\n", elapsed );
+
+  if( opts.verify ){
+    printf("Verifying: ");
+
+    // allocate ping-pong grids
+    Grid* v_grid_r = grid_alloc( grid_size );
+    Grid* v_grid_w = grid_alloc( grid_size );
+    Grid* v_result = v_grid_r;
+
+    populate_grid( v_grid_r );
+
+    double start = omp_get_wtime();
+
+    // Do steps in pairs
+    for( int t = 0; t < iterations; t += 1 ){
+      for( int i = 1; i <= v_grid_r->size; i += 1 ){
+        for( int j = 1; j <= v_grid_r->size; j += 1 ){
+          v_grid_w->data[i][j] = ( v_grid_r->data[i][j] +
+                                 v_grid_r->data[i+1][j] + v_grid_r->data[i][j+1] +
+                                 v_grid_r->data[i-1][j] + v_grid_r->data[i][j-1] ) / 5;
+        }
+      }
+      v_result = v_grid_w;
+      v_grid_w = v_grid_r;
+      v_grid_r = v_result;
+    }
+
+    bool failed = false;
+    for( int i = 1; i <= v_grid_r->size && !failed; i += 1 ){
+      for( int j = 1; j <= v_grid_r->size && !failed; j += 1 ){
+        failed = (v_result->data[i][j] - result->data[i][j] ) >= opts.epsilon;
+        if( failed ){
+          printf("Failed! %f - %f (%f) !< %f @ (%d, %d)\n", result->data[i][j], v_result->data[i][j], result->data[i][j] - v_result->data[i][j], opts.epsilon, i, j);
+        }
+      }
+    }
+
+    if( !failed ){
+      printf("Passed!\n");
+    }
+
+  }
 
   grid_dealloc( grid_r );
   grid_dealloc( grid_w );
