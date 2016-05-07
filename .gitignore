@@ -40,4 +40,4 @@
 
 # Rust trash
 Cargo.lock
-Rust/*/target/
+target/
