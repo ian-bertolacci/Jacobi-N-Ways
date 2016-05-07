@@ -7,3 +7,5 @@ authors = [ "Ian J. Bertolacci <ian.bertolacci@gmail.com>"]
 argparse = "*"
 num = "0.1"
 stopwatch="*"
+rand = "0.3"
+num_cpus = "0.2.11"
