@@ -319,6 +319,7 @@ fn main() {
   let mut _time_steps : Option<u32> = None;
   let mut _grid_size : Option<usize> = None;
   let mut _num_threads : Option<usize> = None;
+  let mut verify : bool = false;
 
   {  // this block limits scope of borrows by ap.refer() method
     let mut ap = ArgumentParser::new();
@@ -332,6 +333,9 @@ fn main() {
 
     ap.refer( &mut _num_threads )
       .add_option( &["-C", "--threads"], StoreOption, "Number of execution threads." );
+
+    ap.refer( &mut verify )
+      .add_option( &["-v", "--verify"], StoreTrue, "Verify the result against serial version." );
 
     ap.parse_args_or_exit();
   }
@@ -364,14 +368,9 @@ fn main() {
     i += 1.0;
   }
 
-  for x in read.domain.dim_range(0){
-    for y in read.domain.dim_range(0){
-      print!("{}\t", read.grid[ read.domain.flat_idx( &[x,y] ) ] );
-    }
-    println!("");
-  }
+  let mut timer = Stopwatch::new();
 
-  println!("=======================================");
+  timer.start();
 
   for t in 0..time_steps {
     let mut part_grid = PartitionedGrid::new_from_grid( &write, min( num_threads, grid_size-2 ) );
@@ -411,5 +410,51 @@ fn main() {
 
   } // for t
 
+  timer.stop();
 
+  println!("Elapsed: {}s", (timer.elapsed().num_nanoseconds().unwrap() as f64)/1e9 );
+
+  if verify {
+    print!("Verifying: ");
+    let mut v_read = Grid::new_from_domain( &grid_domain, &iter_domain );
+    let mut v_write = Grid::new_from_domain( &grid_domain, &iter_domain );
+
+    for t in 0..time_steps{
+      for idx in v_write.iter_domain.iter(){
+        let x = idx[0];
+        let y = idx[1];
+        v_write.grid[ v_write.domain.flat_idx( &[x,y] ) ] =
+          ( v_read.grid[ v_read.domain.flat_idx( &[x  ,y  ] ) ]
+          + v_read.grid[ v_read.domain.flat_idx( &[x-1,y  ] ) ]
+          + v_read.grid[ v_read.domain.flat_idx( &[x+1,y  ] ) ]
+          + v_read.grid[ v_read.domain.flat_idx( &[x  ,y-1] ) ]
+          + v_read.grid[ v_read.domain.flat_idx( &[x  ,y+1] ) ] ) * 0.2;
+      }
+      mem::swap(&mut v_read, &mut v_write);
+    }
+
+    let verified = v_read.domain.iter().fold(true,
+        |res, idx| {
+          res &&
+          v_read.grid[ v_read.domain.flat_idx(&idx[..]) ] == read.grid[ read.domain.flat_idx(&idx[..]) ]
+        } );
+
+    let mut failed = false;
+    for idx in v_write.iter_domain.iter(){
+
+      let v_val = v_read.grid[ v_read.domain.flat_idx(&idx[..]) ];
+      let t_val = read.grid[ read.domain.flat_idx(&idx[..]) ];
+      failed = (v_val == t_val);
+      if( failed ){
+        let x = idx[0];
+        let y = idx[1];
+        println!( "Failed! {} != {} @ ({}, {})", v_val, t_val, x, y );
+      }
+    }
+
+    if( !failed ){
+      println!("Passed!");
+    }
+
+  }
 }
