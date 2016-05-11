@@ -1,0 +1,10 @@
+[package]
+name = "jacobi_1D_Ultra_Naive_Parallel"
+version = "0.0.1"
+authors = [ "Ian J. Bertolacci <ian.bertolacci@gmail.com>"]
+
+[dependencies]
+argparse = "*"
+num = "0.1"
+stopwatch="*"
+rand = "0.3"
