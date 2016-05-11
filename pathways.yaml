@@ -168,6 +168,25 @@ variations :
       directory : $$root/$$path
       command : cargo clean
 
+  - name : jacobi_2D_Naive_Parallel
+    path : jacobi_2D_Naive_Parallel
+    flops : 5
+    dimension : 2
+    options :
+      size :
+        arg : --grid_size
+      iterations :
+        arg : --time_steps
+    build :
+      directory : $$root/$$path
+      command : cargo build --release
+    run:
+      directory : $$root/$$path
+      command : ./target/release/$$name
+    clean:
+      directory : $$root/$$path
+      command : cargo clean
+
   - name : jacobi_3D_Serial
     path : jacobi_3D_Serial
     flops : 7
