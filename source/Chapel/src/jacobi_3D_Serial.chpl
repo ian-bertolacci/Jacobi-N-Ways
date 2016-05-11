@@ -24,7 +24,7 @@ proc main(){
       grid[write,x,y,z] = ( grid[read,x,y,z] +
                             grid[read,x+1,y,z] + grid[read,x,y+1,z] + grid[read,x,y,z+1] +
                             grid[read,x-1,y,z] + grid[read,x,y-1,z] + grid[read,x,y,z-1]
-                          ) / 5;
+                          ) * (1/5);
     }
   }
 

@@ -13,6 +13,13 @@ proc main(){
 
   var grid : [grid_domain] real(64);
 
+  var value = 1.0;
+  for (x,y)  in iteration_domain {
+    grid[0,x,y] = value;
+    grid[1,x,y] = value;
+    value += 1;
+  }
+
   var timer : Timer;
 
   timer.start();
@@ -23,7 +30,7 @@ proc main(){
     for (x,y) in iteration_domain{
       grid[write,x,y] = ( grid[read,x,y] +
                           grid[read,x+1,y] + grid[read,x,y+1] +
-                          grid[read,x-1,y] + grid[read,x,y-1] ) / 5;
+                          grid[read,x-1,y] + grid[read,x,y-1] ) * (1/5);
     }
   }
 
